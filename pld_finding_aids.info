@@ -1,0 +1,7 @@
+name = Prov Lib Digital Finding Aids
+dependencies[] = islandora
+description = Displays a listing of all finding aid datastreams that are part of any collection in the root collection
+package = Islandora
+version = 7.x
+core = 7.x
+stylesheets[all][] = css/pld_finding_aids.css

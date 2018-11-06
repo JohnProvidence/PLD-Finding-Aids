@@ -1,0 +1,117 @@
+<?php
+
+/**
+* Implements hook_block_info()
+*/
+
+function pld_finding_aids_block_info() {
+	$blocks['pld_finding_aids'] = array(
+		'info' => t('Prov Lib Digital Finding Aids'),
+		'visibility' => BLOCK_VISIBILITY_LISTED,
+		'pages' => 'finding-aids',
+		);
+
+	return $blocks;
+}
+
+function pld_finding_aids_permission() {
+	return array(
+		'access pld_finding_aids' => array(
+			'title' => t('User can view and download collection finding aids'),
+		),
+	);
+}
+
+function pld_finding_aids_menu() {
+	$items = array();
+
+	$items['finding-aids'] = array(
+		'title' => 'Finding Aids',
+		'description' => 'Available finding aids for collections in our digital repository',
+		'access arguments' => array('access pld_finding_aids'),
+		'page callback' => 'pld_finding_aids_theme',
+		'type' => MENU_NORMAL_ITEM,
+		'weight' => 1,
+	);
+	return $items;
+}
+
+function pld_finding_aids_block_view($delta = '') {
+	switch($delta) {
+		case 'pld_finding_aids':
+		$block['subject'] = '';
+		$block['content'] = pld_finding_aids_items();
+		return $block;
+	}
+}
+
+function pld_finding_aids_items() {
+	module_load_include('inc', 'islandora', 'includes/datastream');
+  	module_load_include('inc', 'islandora', 'includes/utilities');
+ 	module_load_include('inc', 'islandora', 'includes/metadata');
+ 	module_load_include('inc', 'islandora', 'includes/tuque');
+
+	$items = array();
+
+	$user = user_load(1);
+
+	$connection = islandora_get_tuque_connection($user);
+
+	$repository = $connection->repository;
+
+	$ri = $repository->ri;
+
+	$pid = 'islandora:root';
+
+	$query = <<<EOQ
+	PREFIX fedora: <info:fedora/fedora-system:def/relations-external#>
+	SELECT ?pid ?label
+	FROM <#ri>
+	WHERE {
+		?pid fedora:isMemberOfCollection <info:fedora/$pid> ;
+		<fedora-model:label> ?label ;
+	}
+EOQ;
+
+	$results = $ri->sparqlQuery($query);
+
+	$finding_aids = array();
+
+	foreach($results as $r) {
+		$pid = $r['pid']['value'];
+		$label = $r['label']['value'];
+		$object = islandora_object_load($pid);
+		$finding_aid = $object->getDatastream('FINDING_AID');
+		
+		if($finding_aid == FALSE) {
+			continue;
+		} else {
+			$fa_url = 'islandora/object/'.$pid.'/datastream/FINDING_AID/view';
+			$items[] = array(
+				'pid' => $pid,
+				'label' => $label,
+				'finding_aid' => $fa_url,
+			);
+		}
+	
+	}
+
+	if(!empty($items)):
+		return theme('pld_finding_aids_items', array('items' => $items));
+	endif;
+}
+
+function pld_finding_aids_theme() {
+	$base = array(
+		'path' => drupal_get_path('module', 'pld_finding_aids').'/theme',
+	);
+	return array(
+		'pld_finding_aids_items' => $base + array(
+			'template' => 'pld-finding-aids',
+			'variables' => array('items' => NULL,),
+		),
+	);
+}
+
+
+?>

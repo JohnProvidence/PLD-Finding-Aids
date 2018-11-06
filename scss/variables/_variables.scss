@@ -1,0 +1,46 @@
+/* Fonts */
+$regular : 'ProximaNova-Regular', sans-serif;
+$bold: 'ProximaNovaA-Bold', sans-serif;
+$extrabold: 'ProximaNovaA-Extrabld', sans-serif;
+$semibold: 'ProximaNovaA-Semibold', sans-serif;
+$light: 'ProximaNovaA-Light', sans-serif;
+
+/* PPL Brand Colors */
+$pink: #EC008B;
+$magenta: #B10269;
+$orange: #F89C27;
+$drkorange: #E58307;
+$limegreen: #A6CE38;
+$drkgrey: #27282A;
+$seafoam: #32BCAD;
+$drkseafoam: #008B7F;
+$adminBlue: #D9F0EE;
+$supportBlue: #3086a5;
+
+@mixin linear-gradient($direction, $color-stops...) {
+	@if is-direction($direction) == false {
+		$color-stops: $direction, $color-stops;
+		$direction:180deg;
+	}
+
+	background:nth(nth($color-stops, 1), 1);
+	background: -webkit-linear-gradient(legacy-direction($direction), $color-stops);
+	background: linear-gradient($direction, $color-stops);
+}
+
+
+@mixin btn {
+	background: $seafoam;
+	width: auto;
+	padding: .5rem 1rem;
+	border: solid thin transparent;
+	color: #fff;
+	border-radius: 24px;
+	min-width: 100px;
+	text-align: center;
+	transition: all .3s ease-in-out;
+
+	&:hover {
+		background: darken($seafoam, 15%);
+	}
+}
