@@ -52,6 +52,13 @@
 
 		a.btn {
 			@include btn;
+			max-width: 200px;
+			margin: 0 auto;
+			svg.svg-inline--fa {
+				color: #fff;
+				font-size: 1rem;
+				margin-left: .25rem;
+			}
 		}
 	}
 }

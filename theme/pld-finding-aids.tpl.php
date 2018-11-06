@@ -14,7 +14,7 @@
 		<a href="<?php print $fa; ?>"><i class="fas fa-file" aria-hidden="true"></i>
 		</a>
 		<a href="islandora/object/<?php print $pid?>" class="collection-title"><?php print $label; ?></a>
-		<a href="<?php print $fa; ?>" class="btn">View Finding Aid</a>
+		<a href="<?php print $fa; ?>" class="btn">View Finding Aid <i class="fas fa-angle-right" aria-hidden="true"></i></a>
 	</div>
 	<?php
 		}
