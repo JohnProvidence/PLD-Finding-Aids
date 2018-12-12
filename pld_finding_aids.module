@@ -80,9 +80,34 @@ EOQ;
 	foreach($results as $r) {
 		$pid = $r['pid']['value'];
 		$label = $r['label']['value'];
+		// load islandora object from pid / get finding aid datastream, if it exists...
 		$object = islandora_object_load($pid);
 		$finding_aid = $object->getDatastream('FINDING_AID');
+		$tn = $object->getDatastream('TN');
+
+		if($tn != FALSE) {
+			$thumbnail_img = '/islandora/object/'.$pid.'/datastream/TN/view';
+		} else {
+			$thumbnail_img = drupal_get_path('theme', 'pld') . '/img/no_image_available.png';
+		}
 		
+		//get metadata information, if it exists...
+		if (islandora_datastream_access(ISLANDORA_VIEW_OBJECTS, $object['DC'])) {
+	    	try {
+		      $dc = $object['DC']->content;
+		      $dc_object = DublinCore::importFromXMLString($dc);
+		      $dc_object = $dc_object->dc;
+		      $description = $dc_object['dc:description'];
+		      $description = $description[0];
+
+		      
+
+	    	}
+		    catch (Exception $e) {
+		      drupal_set_message(t('Error retrieving object %s %t', array('%s' => $object->id, '%t' => $e->getMessage())), 'error', FALSE);
+		    }
+  		}
+
 		if($finding_aid == FALSE) {
 			continue;
 		} else {
@@ -91,6 +116,9 @@ EOQ;
 				'pid' => $pid,
 				'label' => $label,
 				'finding_aid' => $fa_url,
+				'description' => $description,
+				'thumbnail_image' => $thumbnail_img,
+				'collection_url' => '/islandora/object/'.$pid,
 			);
 		}
 	
@@ -112,6 +140,5 @@ function pld_finding_aids_theme() {
 		),
 	);
 }
-
 
 ?>
